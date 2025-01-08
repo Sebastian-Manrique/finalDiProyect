@@ -1,7 +1,6 @@
 import random
 import time
-from PIL import Image, ImageTk
-
+from PIL import Image
 import customtkinter as ctk
 
 import funciones as func
@@ -16,7 +15,7 @@ class MemoryGame(ctk.CTk):
         func.centrarPantalla(self, 750, 750)
         self.rows = 5
         self.columns = 4
-        self.pairs = (self.rows * self.columns) // 2  # Numero de pares
+        self.pairs = (self.rows * self.columns) // 2  # Número de pares
         self.images = self.load_images()  # Cargar imágenes
         self.symbols = self.generate_symbols()
         self.buttons = {}  # Diccionario para guardar los botones
@@ -55,8 +54,11 @@ class MemoryGame(ctk.CTk):
 
         idx = row * self.columns + col  # Índice de la imagen
         image = self.symbols[idx]  # Obtiene la imagen para esa celda
-        self.buttons[(row, col)].configure(image=image["image"], text="")
-        self.revealed.append((row, col))
+
+        # Asegúrate de que 'image' tenga la clave 'image' y que el botón exista
+        if (row, col) in self.buttons:
+            self.buttons[(row, col)].configure(image=image, text="", state="disabled")
+            self.revealed.append((row, col))
 
         if len(self.revealed) == 2:  # Si hay dos revelados, comprueba coincidencia
             self.after(1000, self.check_match)  # Espera 1 segundo para comprobar
@@ -67,13 +69,13 @@ class MemoryGame(ctk.CTk):
         idx1 = r1 * self.columns + c1
         idx2 = r2 * self.columns + c2
 
-        if self.symbols[idx1]["image"] == self.symbols[idx2]["image"]:  # Si coinciden
+        if self.symbols[idx1] == self.symbols[idx2]:  # Si coinciden
             self.matched_pairs += 1
-            self.buttons[(r1, c1)].configure(state="disabled")
-            self.buttons[(r2, c2)].configure(state="disabled")
+            self.buttons[(r1, c1)].configure(state="disabled", fg_color="green")
+            self.buttons[(r2, c2)].configure(state="disabled", fg_color="green")
         else:  # Si no coinciden
-            self.buttons[(r1, c1)].configure(image=None, text="?")
-            self.buttons[(r2, c2)].configure(image=None, text="?")
+            self.buttons[(r1, c1)].configure(image=None, text="?", state="normal")
+            self.buttons[(r2, c2)].configure(image=None, text="?", state="normal")
 
         self.revealed = []  # Reinicia las celdas reveladas
         self.attempts += 1  # Incrementa los intentos
@@ -91,20 +93,24 @@ class MemoryGame(ctk.CTk):
             self.after(1000, self.update_timer)
 
     def load_images(self):
-        """Carga las imágenes y sus nombres, y las convierte a CTkImage."""
+        """Carga las imágenes y las convierte a CTkImage."""
         images = []
         for i in range(1, self.pairs + 1):  # Asume que las imágenes están numeradas de 1 a 10
             img = Image.open(f"imagenes/{i}.png")  # Carga la imagen
-            ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(80, 80))  # Convierte a CTkImage
-            images.append({"image": ctk_img, "name": f"{i}"})  # Asocia la imagen con su nombre
+            ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(63, 63))  # Convierte a CTkImage
+            images.append(ctk_img)  # Añade la imagen a la lista
         return images
 
     def generate_symbols(self):
         """Genera una lista de pares de imágenes aleatorios."""
         symbols = self.images * 2  # Crear pares de cada imagen
         random.shuffle(symbols)  # Barajar los símbolos
-        return symbols
 
-    def get_image_name(self, idx):
-        """Obtiene el nombre de la imagen en un índice específico."""
-        return self.symbols[idx]["name"]
+        # print("\nTablero generado:")
+        # for i in range(self.rows):
+        #     row_symbols = symbols[i * self.columns:(i + 1) * self.columns]  # Slice para obtener cada fila
+        #     row_positions = [f"{i},{j}" for j in range(self.columns)]  # Generar las posiciones de la fila
+        #     for j, symbol in enumerate(row_symbols):
+        #         print(f"Posición [{row_positions[j]}]: {symbol}")
+
+        return symbols

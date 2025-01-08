@@ -1,4 +1,4 @@
-from random import random, randrange
+from random import randrange
 
 import customtkinter as ctk
 import pandas as pd
