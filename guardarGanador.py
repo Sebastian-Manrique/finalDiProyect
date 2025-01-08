@@ -9,7 +9,7 @@ class guardarGanador(ctk.CTk):
     def __init__(self, tiempo: int, intentos: int):
         super().__init__()
         self.title("Victoria")  # Título
-        self.after(201, lambda: self.iconbitmap('cardsIcons.ico'))
+        self.after(201, lambda: self.iconbitmap('imagenes/cardsIcons.ico'))
         # Centra la pantalla con las medidas pasadas
         func.centrarPantalla(self, 500, 230)
         # Ajusta el peso de la cuadrícula
@@ -30,7 +30,7 @@ class guardarGanador(ctk.CTk):
 
         # No guardar info
         btnNo = ctk.CTkButton(self, text="No", width=200, height=50, fg_color="red", hover_color="darkred",
-                              command=lambda: guardarEnCSV(tiempo, "", intentos), font=("Arial", 20))
+                              command=lambda: guardarEnCSV(tiempo+1, "", intentos), font=("Arial", 20))
         btnNo.grid(row=2, column=2, pady=20, padx=10, sticky="nsew")
 
         self.mainloop()

@@ -14,8 +14,8 @@ class pregunta(ctk.CTk):
     def __init__(self, tiempo: int, intentos: int):
 
         super().__init__()
+        self.after(201, lambda: self.iconbitmap('imagenes/cardsIcons.ico'))
         self.title("Guardar nombre")
-        self.after(201, lambda: self.iconbitmap('cardsIcons.ico'))
         func.centrarPantalla(self, 475, 205)
         func.configure_grid(self, 3, 1)
         # Etiqueta
@@ -34,7 +34,7 @@ class pregunta(ctk.CTk):
         """Metodo para guardar el nombre introducido."""
         nombre = self.entry_nombre.get()  # aqui agarra el texto
         if nombre.strip():  # Mira que no este vacio
-            guardarEnCSV(tiempo, nombre, intentos)
+            guardarEnCSV(tiempo+1, nombre, intentos)
             quit()
         else:
             print("El nombre no puede estar vacío.")
@@ -48,11 +48,11 @@ def guardarEnCSV(tiempo, nombre, intentos):
 
     # Obtiene la fecha y hora actuales
     fecha = datetime.datetime.now()
-
+    s = f"{tiempo}s"
     # Datos a guardar
     data = {
         "Nombre": [nombre],
-        "Tiempo": [tiempo + 1],
+        "Tiempo": [s],
         "Intentos": [intentos],
         "Fecha": [fecha.strftime("%d/%m/%Y")],
         "Hora": [fecha.strftime("%H:%M:%S")],
