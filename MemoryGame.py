@@ -38,42 +38,24 @@ class MemoryGame(ctk.CTk):
         self.timer_label.grid(row=self.rows + 1, column=0, columnspan=self.columns)
         self.update_timer()
 
-    def generate_symbols(self):
-        """Genera una lista de pares de símbolos aleatorios."""
-        # Generar la base de símbolos: letras y emojis
-        base_symbols = [chr(i) for i in range(65, 65 + self.pairs - 2)]  # Letras A, B, C...
-        base_symbols += ["🍎", "🍇"]  # Añadir los emojis como símbolos únicos
-
-        # Ajustar para tener exactamente 10 pares
-        symbols = base_symbols[:self.pairs] * 2  # Recorta a 10 pares y duplica
-        random.shuffle(symbols)  # Baraja los símbolos
-
-        # DEBUG: Imprime los símbolos en formato de tablero
-        print("\nTablero generado:")
-        for i in range(self.rows):
-            row = symbols[i * self.columns:(i + 1) * self.columns]  # Slice para obtener cada fila
-            print("[" + "][".join(row) + "]")  # Formato de fila con corchetes
-
-        return symbols
-
     def create_board(self):
         """Crea los botones en el tablero."""
         for row in range(self.rows):
             for col in range(self.columns):
                 btn = ctk.CTkButton(self, text="?", width=80, height=80,
-                                    command=lambda r=row, c=col: self.reveal_tile(r, c), font=("Arial", 20),
-                                    text_color="black")
+                                    command=lambda r=row, c=col: self.reveal_tile(r, c),
+                                    font=("Arial", 20), text_color="black")
                 btn.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
                 self.buttons[(row, col)] = btn
 
     def reveal_tile(self, row, col):
-        """Revela el símbolo en la celda seleccionada."""
+        """Revela la imagen en la celda seleccionada."""
         if (row, col) in self.revealed or len(self.revealed) == 2:
             return  # No se puede revelar más de dos a la vez
 
-        idx = row * self.columns + col  # Índice en la lista de símbolos
-        symbol = self.symbols[idx]  # Obtiene el símbolo para esa celda
-        self.buttons[(row, col)].configure(text=symbol, state="disabled", text_color="black")  # Muestra el símbolo
+        idx = row * self.columns + col  # Índice de la imagen
+        image = self.symbols[idx]  # Obtiene la imagen para esa celda
+        self.buttons[(row, col)].configure(image=image["image"], text="")
         self.revealed.append((row, col))
 
         if len(self.revealed) == 2:  # Si hay dos revelados, comprueba coincidencia
@@ -85,13 +67,13 @@ class MemoryGame(ctk.CTk):
         idx1 = r1 * self.columns + c1
         idx2 = r2 * self.columns + c2
 
-        if self.symbols[idx1] == self.symbols[idx2]:  # Si coinciden
+        if self.symbols[idx1]["image"] == self.symbols[idx2]["image"]:  # Si coinciden
             self.matched_pairs += 1
-            self.buttons[(r1, c1)].configure(text="✔", fg_color="green")
-            self.buttons[(r2, c2)].configure(text="✔", fg_color="green")
+            self.buttons[(r1, c1)].configure(state="disabled")
+            self.buttons[(r2, c2)].configure(state="disabled")
         else:  # Si no coinciden
-            self.buttons[(r1, c1)].configure(text="?", state="normal")
-            self.buttons[(r2, c2)].configure(text="?", state="normal")
+            self.buttons[(r1, c1)].configure(image=None, text="?")
+            self.buttons[(r2, c2)].configure(image=None, text="?")
 
         self.revealed = []  # Reinicia las celdas reveladas
         self.attempts += 1  # Incrementa los intentos
@@ -107,3 +89,22 @@ class MemoryGame(ctk.CTk):
         self.timer_label.configure(text=f"Tiempo: {elapsed_time}s")
         if self.matched_pairs < self.pairs:  # Sigue actualizando si el juego no ha terminado
             self.after(1000, self.update_timer)
+
+    def load_images(self):
+        """Carga las imágenes y sus nombres, y las convierte a CTkImage."""
+        images = []
+        for i in range(1, self.pairs + 1):  # Asume que las imágenes están numeradas de 1 a 10
+            img = Image.open(f"imagenes/{i}.png")  # Carga la imagen
+            ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(80, 80))  # Convierte a CTkImage
+            images.append({"image": ctk_img, "name": f"{i}"})  # Asocia la imagen con su nombre
+        return images
+
+    def generate_symbols(self):
+        """Genera una lista de pares de imágenes aleatorios."""
+        symbols = self.images * 2  # Crear pares de cada imagen
+        random.shuffle(symbols)  # Barajar los símbolos
+        return symbols
+
+    def get_image_name(self, idx):
+        """Obtiene el nombre de la imagen en un índice específico."""
+        return self.symbols[idx]["name"]
