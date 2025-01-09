@@ -71,8 +71,8 @@ class MemoryGame(ctk.CTk):
 
         if self.symbols[idx1] == self.symbols[idx2]:  # Si coinciden
             self.matched_pairs += 1
-            self.buttons[(r1, c1)].configure(state="disabled", fg_color="green")
-            self.buttons[(r2, c2)].configure(state="disabled", fg_color="green")
+            self.buttons[(r1, c1)].configure(image=None, state="disabled", fg_color="green", text="✔")
+            self.buttons[(r2, c2)].configure(image=None, state="disabled", fg_color="green",  text="✔")
         else:  # Si no coinciden
             self.buttons[(r1, c1)].configure(image=None, text="?", state="normal")
             self.buttons[(r2, c2)].configure(image=None, text="?", state="normal")
